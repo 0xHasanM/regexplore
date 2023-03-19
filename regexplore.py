@@ -12,6 +12,7 @@ from volatility3.framework.layers.registry import RegistryHive, RegistryFormatEx
 from volatility3.framework.renderers import TreeGrid, conversion, format_hints
 from volatility3.framework.symbols.windows.extensions.registry import RegValueTypes
 from volatility3.plugins.windows.registry import hivelist
+from volatility3.plugins.windows.registry.regexplore.MountedDevices import MountedDevices
 
 vollog = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="key", description="Key to start from", default=None, optional=True
+                name="keysset", description="Keys to extract and analyze [MountedDevices, all]", default=None, optional=False
             )
         ]
 
@@ -257,28 +258,21 @@ class regexplore(interfaces.plugins.PluginInterface):
                         ),
                     )
                     yield result
-                    break
             else:
                 continue
 
     def run(self):
         offset = self.config.get("offset", None)
         kernel = self.context.modules[self.config["kernel"]]
-        self.config['key'] = 'Microsoft\Windows\CurrentVersion\Run'
-        self.config['hive_name'] = 'SOFTWARE'
+        keysset = self.config.get("keysset", None)
+        
+        module_mapping = {
+            "MountedDevices": MountedDevices
+        }
 
-        return TreeGrid(
-            columns=[
-                ("Last Write Time", datetime.datetime),
-                ("Name", str),
-                ("Data", format_hints.MultiTypeData)
-            ],
-            generator=self._registry_walker(
-                kernel.layer_name,
-                kernel.symbol_table_name,
-                hive_offsets=None if offset is None else [offset],
-                key=self.config.get("key", None),
-                hive_name=self.config.get('hive_name', None),
-                recurse=self.config.get("recurse", None),
-            ),
-        )
+        if keysset not in module_mapping:
+            raise ValueError(f"Invalid keysset value. Allowed values are {', '.join(module_mapping.keys())}")
+
+        module_function = module_mapping[keysset]
+        
+        return module_function(self._registry_walker, kernel, offset)
