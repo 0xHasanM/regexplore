@@ -32,7 +32,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="keysset", description="Keys to extract and analyze [MountedDevices, all]", default=None, optional=False
+                name="keysset", description="Keys to extract and analyze [MountedDevices]", default=None, optional=False
             )
         ]
 
