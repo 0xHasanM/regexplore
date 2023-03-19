@@ -4,9 +4,9 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 ## Usage
 
-1. Load the plugin in Volatility using the command `volatility --plugins=/path/to/plugins -f memory_dump.raw pluginname`. 
+1. Load the plugin in Volatility using the command `volatility3 --plugins=/path/to/plugins -f memory_dump.raw windows.registry.regexplore`. 
 
-2. Run the plugin using the command `python vol.py regexplore -h` to display the available options and commands.
+2. Run the plugin using the command `python vol.py windows.registry.regexplore -h` to display the available options and commands.
 
 ## Available Commands
 
