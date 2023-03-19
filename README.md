@@ -1,6 +1,6 @@
 # Regexplore
 
-Regexplore is a Volatility plugin designed to mimic the functionality of the Registry Explorer plugins in EZsuite. It allows users to list different types of registry information by taking input from the user, such as runkeys, connected devices, and more.
+Regexplore is a Volatility plugin designed to mimic the functionality of the Registry Explorer plugins in EZsuite. It allows users to list different types of registry information in memory, such as runkeys, connected devices, and more.
 
 ## Usage
 
