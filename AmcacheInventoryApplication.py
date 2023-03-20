@@ -35,7 +35,7 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None):
             if str(subkey[1][2]) != 'Key':
                 registry_key = subkey[1][1]
                 registry_value = subkey[1][2]
-                registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='replace')
+                registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
 
                 # Initialize the registry key entry if it doesn't exist
                 if registry_key not in entries:
@@ -57,7 +57,7 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None):
                 values["Publisher"],
                 values["Source"],
                 values["RootDirPath"],
-                values["UninstallString"]
+                values["UninstallString"] if "UninstallString" in values else '',
             ),
         )
         yield result
