@@ -26,7 +26,7 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None, r
             0,
             (
                 device_name,
-                device_data.decode('utf-8', errors='replace')
+                device_data.decode('utf-8', errors='ignore')
             ),
         )
         yield result
