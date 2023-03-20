@@ -13,6 +13,7 @@ from volatility3.framework.renderers import TreeGrid, conversion, format_hints
 from volatility3.framework.symbols.windows.extensions.registry import RegValueTypes
 from volatility3.plugins.windows.registry import hivelist
 from volatility3.plugins.windows.registry.regexplore.MountedDevices import MountedDevices
+from volatility3.plugins.windows.registry.regexplore.AmcacheInventoryApplication import AmcacheInventoryApplication
 
 vollog = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="keysset", description="Keys to extract and analyze [MountedDevices]", default=None, optional=False
+                name="keysset", description="Keys to extract and analyze {MountedDevices, AmcacheInventoryApplication}", default=None, optional=False
             )
         ]
 
@@ -203,6 +204,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                     depth,
                     (
                         last_write_time,
+                        key_node_name if 'key_node_name' in locals() else renderers.UnreadableValue(),
                         value_node_name,
                         value_data
                     ),
@@ -254,6 +256,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                         (
                             renderers.UnreadableValue(),
                             renderers.UnreadableValue(),
+                            renderers.UnreadableValue(),
                             renderers.UnreadableValue()
                         ),
                     )
@@ -267,7 +270,8 @@ class regexplore(interfaces.plugins.PluginInterface):
         keysset = self.config.get("keysset", None)
         
         module_mapping = {
-            "MountedDevices": MountedDevices
+            "MountedDevices": MountedDevices,
+            "AmcacheInventoryApplication": AmcacheInventoryApplication
         }
 
         if keysset not in module_mapping:
