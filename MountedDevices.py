@@ -6,24 +6,22 @@ COLUMNS = [
     ("Device Data", str)
 ]
 
-def processvalues(_registry_walker,
-                  kernel,
-                  offset,
-                  key: str = None,
-                  hive_name: str = None):
+def process_values(_registry_walker, kernel, offset, key=None, hive_name=None, recurse=None):
     """
     Process registry values and return device name and data.
     """
-    for value in _registry_walker(
-        kernel.layer_name,
-        kernel.symbol_table_name,
-        hive_offsets=None if offset is None else [offset],
-        key=key,
-        hive_name=hive_name,
-        recurse=None,
-    ):
-        device_name = value[1][1]
-        device_data = value[1][2].replace(b'\x00', b'')
+    walker_options = {
+        "layer_name": kernel.layer_name,
+        "symbol_table": kernel.symbol_table_name,
+        "hive_offsets": None if offset is None else [offset],
+        "key": key,
+        "hive_name": hive_name,
+        "recurse": recurse,
+    }
+
+    for value in _registry_walker(**walker_options):
+        device_name = value[1][2]
+        device_data = value[1][3].replace(b'\x00', b'')
         result = (
             0,
             (
@@ -33,16 +31,15 @@ def processvalues(_registry_walker,
         )
         yield result
 
-def MountedDevices(_registry_walker,
-                   kernel,
-                   offset):
+
+def MountedDevices(_registry_walker, kernel, offset):
     """
     Create a TreeGrid with device name and data.
     """
     key = 'MountedDevices'
     hive_name = 'SYSTEM'
-    
-    generator = processvalues(
+
+    generator = process_values(
         _registry_walker,
         kernel,
         offset,
