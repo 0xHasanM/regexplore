@@ -16,8 +16,6 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None):
     """
     Process registry values and return Programs data.
     """
-    entries = {}
-
     # Define options for the registry walker
     walker_options = {
         "layer_name": kernel.layer_name,
@@ -29,6 +27,7 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None):
     }
 
     # Iterate through the registry walker output
+    entries = {}
     for subkey in _registry_walker(**walker_options):
         try:
             # Only process values, not keys
@@ -43,24 +42,26 @@ def process_values(_registry_walker, kernel, offset, key=None, hive_name=None):
 
                 # Store the registry value and data
                 entries[registry_key][registry_value] = registry_data
-        except TypeError:
-            continue
 
-    # Convert entries into a tuple format suitable for the TreeGrid
-    for registry_key, values in entries.items():
-        result = (
-            0,
-            (
-                values['Timestamp'],
-                values["Name"],
-                values["Version"],
-                values["Publisher"],
-                values["Source"],
-                values["RootDirPath"],
-                values["UninstallString"] if "UninstallString" in values else '',
-            ),
-        )
-        yield result
+                # Convert the entry into a tuple and yield it
+            else:
+                result = (
+                    0,
+                    (
+                        entries[registry_key].get("Timestamp", ""),
+                        entries[registry_key].get("Name", ""),
+                        entries[registry_key].get("Version", ""),
+                        entries[registry_key].get("Publisher", ""),
+                        entries[registry_key].get("Source", ""),
+                        entries[registry_key].get("RootDirPath", ""),
+                        entries[registry_key].get("UninstallString", ""),
+                    ),
+                )
+                yield result
+                entries = {}
+
+        except KeyError:
+            continue
 
 def AmcacheInventoryApplication(_registry_walker, kernel, offset):
     """
