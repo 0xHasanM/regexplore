@@ -12,8 +12,7 @@ from volatility3.framework.layers.registry import RegistryHive, RegistryFormatEx
 from volatility3.framework.renderers import TreeGrid, conversion, format_hints
 from volatility3.framework.symbols.windows.extensions.registry import RegValueTypes
 from volatility3.plugins.windows.registry import hivelist
-from volatility3.plugins.windows.registry.regexplore.MountedDevices import MountedDevices
-from volatility3.plugins.windows.registry.regexplore.AmcacheInventoryApplication import AmcacheInventoryApplication
+from volatility3.plugins.windows.registry.regexplore import *
 
 vollog = logging.getLogger(__name__)
 
@@ -270,8 +269,9 @@ class regexplore(interfaces.plugins.PluginInterface):
         keysset = self.config.get("keysset", None)
         
         module_mapping = {
-            "MountedDevices": MountedDevices,
-            "AmcacheInventoryApplication": AmcacheInventoryApplication
+            "MountedDevices": MountedDevices.MountedDevices,
+            "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
+            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile
         }
 
         if keysset not in module_mapping:
