@@ -22,6 +22,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 - `uninstall`: Lists the programs that have been uninstalled on the system (to-do)
 - `network`: Lists the network information and connections on the system (to-do)
 - `all`: export all information in csv files to be feed to splunk, or TimeLineExplorer (to-do)
+- `gui`: gui to go through the output of commands (to-do)
 ## Contributing
 
 If you find any issues or have suggestions for new features, please feel free to create an issue or submit a pull request. We appreciate your contributions and recommendations to improve the Regexplore plugin!
