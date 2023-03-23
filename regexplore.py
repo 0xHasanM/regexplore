@@ -15,7 +15,7 @@ from volatility3.plugins.windows.registry import hivelist
 from volatility3.plugins.windows.registry.regexplore import *
 
 vollog = logging.getLogger(__name__)
-
+hive_list = []
 
 class regexplore(interfaces.plugins.PluginInterface):
     """Lists the registry keys under a hive or specific key value."""
@@ -214,69 +214,81 @@ class regexplore(interfaces.plugins.PluginInterface):
         self,
         layer_name: str,
         symbol_table: str,
-        hive_offsets: List[int] = None,
+        hive_list: List[hivelist.HiveList],
         key: str = None,
         hive_name: str = None,
         recurse: bool = False,
     ):
-        for hive in hivelist.HiveList.list_hives(
-            self.context,
-            self.config_path,
-            layer_name=layer_name,
-            symbol_table=symbol_table,
-            hive_offsets=hive_offsets,
-        ):
-            if hive_name in hive.get_name():
+
+        for hive in hive_list:
+            if hive_name.lower() in hive.get_name().lower():
                 try:
-                    # Walk it
-                    if key is not None:
-                        node_path = hive.get_key(key, return_list=True)
-                    else:
-                        node_path = [hive.get_node(hive.root_cell_offset)]
+                    node_path = hive.get_key(key, return_list=True) if key else [hive.get_node(hive.root_cell_offset)]
+
                     for x, y in self._printkey_iterator(hive, node_path, recurse=recurse):
                         yield (x - len(node_path), y)
-                except (
-                    exceptions.InvalidAddressException,
-                    KeyError,
-                    RegistryFormatException,
-                ) as excp:
-                    if isinstance(excp, KeyError):
-                        vollog.debug(
-                            f"Key '{key}' not found in Hive at offset {hex(hive.hive_offset)}."
-                        )
-                    elif isinstance(excp, RegistryFormatException):
-                        vollog.debug(excp)
-                    elif isinstance(excp, exceptions.InvalidAddressException):
-                        vollog.debug(
-                            f"Invalid address identified in Hive: {hex(excp.invalid_address)}"
-                        )
-                    result = (
-                        0,
-                        (
-                            renderers.UnreadableValue(),
-                            renderers.UnreadableValue(),
-                            renderers.UnreadableValue(),
-                            renderers.UnreadableValue()
-                        ),
-                    )
-                    yield result
+                except (exceptions.InvalidAddressException, KeyError, RegistryFormatException) as excp:
+                    self.handle_exceptions(excp, key, hive)
             else:
                 continue
 
+    @staticmethod
+    def handle_exceptions(exception: Exception, key: str, hive: hivelist.HiveList) -> None:
+        if isinstance(exception, KeyError):
+            vollog.debug(f"Key '{key}' not found in Hive at offset {hex(hive.hive_offset)}.")
+        elif isinstance(exception, RegistryFormatException):
+            vollog.debug(exception)
+        elif isinstance(exception, exceptions.InvalidAddressException):
+            vollog.debug(f"Invalid address identified in Hive: {hex(exception.invalid_address)}")
+
+        yield (0, (renderers.UnreadableValue(),) * 4)
+
+    def run_all(
+        self,
+        module_mapping,
+        _registry_walker,
+        kernel,
+        hive_list: List[hivelist.HiveList],
+    ):
+        progress = 0
+        for module_name, module_function in module_mapping.items():
+            progress += 1
+            module_function(_registry_walker, kernel, hive_list=hive_list, file_output=True)
+            yield (0, (module_name, f'regexplore/{module_name}.csv', f'{progress}/3'))
+
     def run(self):
-        offset = self.config.get("offset", None)
         kernel = self.context.modules[self.config["kernel"]]
         keysset = self.config.get("keysset", None)
-        
+
         module_mapping = {
             "MountedDevices": MountedDevices.MountedDevices,
             "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
             "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile
         }
 
-        if keysset not in module_mapping:
-            raise ValueError(f"Invalid keysset value. Allowed values are {', '.join(module_mapping.keys())}")
-
-        module_function = module_mapping[keysset]
+        hive_list = [
+            hive
+            for hive in hivelist.HiveList.list_hives(
+                self.context,
+                self.config_path,
+                layer_name=kernel.layer_name,
+                symbol_table=kernel.symbol_table_name
+            )
+        ]
         
-        return module_function(self._registry_walker, kernel, offset)
+        if keysset == 'run_all':
+            return TreeGrid(
+                columns=[
+                    ("Module name", str),
+                    ("Output path", str),
+                    ("Progress", str),
+                ],
+                generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list),
+            )
+        else:
+            if keysset not in module_mapping:
+                allowed_values = ', '.join(module_mapping.keys())
+                raise ValueError(f"Invalid keysset value. Allowed values are {allowed_values}")
+
+            module_function = module_mapping[keysset]
+            return module_function(self._registry_walker, kernel, hive_list)
