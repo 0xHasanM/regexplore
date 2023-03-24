@@ -20,7 +20,6 @@ def write_result_to_csv(
     hive_list,
     key=None,
     hive_name=None,
-    recurse=None,
     output_path='regexplore/AmcacheInventoryApplication.csv'
     ):
     

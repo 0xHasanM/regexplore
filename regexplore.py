@@ -32,7 +32,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="keysset", description="Keys to extract and analyze {MountedDevices, AmcacheInventoryApplication}", default=None, optional=False
+                name="keysset", description="Keys to extract and analyze {run_all, MountedDevices, AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut}", default=None, optional=False
             )
         ]
 
@@ -254,7 +254,7 @@ class regexplore(interfaces.plugins.PluginInterface):
         for module_name, module_function in module_mapping.items():
             progress += 1
             module_function(_registry_walker, kernel, hive_list=hive_list, file_output=True)
-            yield (0, (module_name, f'regexplore/{module_name}.csv', f'{progress}/3'))
+            yield (0, (module_name, f'regexplore/{module_name}.csv', f'{progress}/{len(module_mapping)}'))
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
@@ -263,7 +263,8 @@ class regexplore(interfaces.plugins.PluginInterface):
         module_mapping = {
             "MountedDevices": MountedDevices.MountedDevices,
             "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
-            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile
+            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
+            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut
         }
 
         hive_list = [

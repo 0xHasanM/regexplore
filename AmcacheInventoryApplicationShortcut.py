@@ -1,16 +1,12 @@
 import datetime
 from volatility3.framework.renderers import TreeGrid, format_hints
-import os 
+from volatility3.framework.interfaces import layers
+import os
 
 # Define the columns for the TreeGrid
 COLUMNS = [
     ("Timestamp", str),
-    ("Path", str),
-    ("Name", str),
-    ("Product", str),
-    ("Publisher", str),
-    ("Version", str),
-    ("SHA1", str)
+    ("Path", str)
 ]
 
 def write_result_to_csv(
@@ -19,7 +15,7 @@ def write_result_to_csv(
     hive_list,
     key=None,
     hive_name=None,
-    output_path='regexplore/AmcacheInventoryApplicationFile.csv'
+    output_path='regexplore/AmcacheInventoryApplicationShortcut.csv'
     ):
     
     walker_options = {
@@ -34,7 +30,7 @@ def write_result_to_csv(
     os.makedirs('regexplore', exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as file_handle:
-        header = "Timestamp,Path,Name,Product,Publisher,Version,SHA1\n"
+        header = "Timestamp,Name,Version,Publisher,Source,RootDirPath,UninstallString\n"
         file_handle.write(header)
         entries = {}
         for subkey in _registry_walker(**walker_options):
@@ -55,15 +51,14 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},{entries[registry_key].get("Path", "")},{entries[registry_key].get("Name", "")},'
-                        f'{entries[registry_key].get("Product", "")},{entries[registry_key].get("Publisher", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Version", "")},{entries[registry_key].get("SHA1", "")}\n'
+                        f'{entries[registry_key]["Timestamp"]},{entries[registry_key].get("ShortcutPath", "")},'
                     )
                     entries = {}
     
             except (KeyError, UnboundLocalError):
                 continue
-
+    return
+    
 def process_values(
     _registry_walker,
     kernel,
@@ -109,12 +104,7 @@ def process_values(
                     0,
                     (
                         entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("LowerCaseLongPath", ""),
-                        entries[registry_key].get("Name", ""),
-                        entries[registry_key].get("ProductName", ""),
-                        entries[registry_key].get("Publisher", ""),
-                        entries[registry_key].get("Version", ""),
-                        str(entries[registry_key].get("FileId", "")).lstrip('0000')
+                        entries[registry_key].get("ShortcutPath", ""),
                     ),
                 )
                 yield result
@@ -123,20 +113,17 @@ def process_values(
         except (KeyError, UnboundLocalError):
             continue
 
-    # Convert entries into a tuple format suitable for the TreeGrid
-
-def AmcacheInventoryApplicationFile(
+def AmcacheInventoryApplicationShortcut(
     _registry_walker,
     kernel,
     hive_list,
     file_output=False
     ):
-    
     """
     Create a TreeGrid with Programs data.
     """
     # Define the registry key and hive name to process
-    key = 'ROOT\InventoryApplicationFile'
+    key = 'ROOT\InventoryApplicationShortcut'
     hive_name = 'Amcache.hve'
 
     if file_output:

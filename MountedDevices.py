@@ -13,7 +13,6 @@ def write_result_to_csv(
     hive_list,
     key=None,
     hive_name=None,
-    recurse=None,
     output_path='regexplore/MountedDevices.csv'
     ):
     
@@ -23,7 +22,7 @@ def write_result_to_csv(
         'hive_list': hive_list,
         'key': key,
         'hive_name': hive_name,
-        'recurse': recurse,
+        'recurse': False,
     }
     
     os.makedirs('regexplore', exist_ok=True)
@@ -40,6 +39,7 @@ def write_result_to_csv(
 def process_values(
     _registry_walker,
     kernel,
+    hive_list,
     key=None,
     hive_name=None,
     file_output=False
@@ -54,7 +54,7 @@ def process_values(
         'hive_list': hive_list,
         'key': key,
         'hive_name': hive_name,
-        'recurse': recurse,
+        'recurse': False,
     }
         
     for value in _registry_walker(**walker_options):
