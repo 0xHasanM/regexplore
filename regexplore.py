@@ -12,7 +12,7 @@ from volatility3.framework.layers.registry import RegistryHive, RegistryFormatEx
 from volatility3.framework.renderers import TreeGrid, conversion, format_hints
 from volatility3.framework.symbols.windows.extensions.registry import RegValueTypes
 from volatility3.plugins.windows.registry import hivelist
-from volatility3.plugins.windows.registry.regexplore import *
+from volatility3.plugins.windows.registry.regexplore.registryplugins import *
 
 vollog = logging.getLogger(__name__)
 hive_list = []
@@ -283,13 +283,13 @@ class regexplore(interfaces.plugins.PluginInterface):
     
         # Define module and hive mappings
         module_mapping = {
-            "MountedDevices": MountedDevices.MountedDevices,
-            "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
-            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
-            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut,
-            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer,
-            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp.AmcacheInventoryDevicePnp,
-            "AmcacheInventoryDriverBinary": AmcacheInventoryDriverBinary.AmcacheInventoryDriverBinary
+            "MountedDevices": MountedDevices,
+            "AmcacheInventoryApplication": AmcacheInventoryApplication,
+            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile,
+            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut,
+            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer,
+            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp,
+            "AmcacheInventoryDriverBinary": AmcacheInventoryDriverBinary
         }
         hive_mapping = {
             "system": {
