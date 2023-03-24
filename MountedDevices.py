@@ -33,7 +33,7 @@ def write_result_to_csv(
         for value in _registry_walker(**walker_options):
             device_name = value[1][2]
             device_data = value[1][3].replace(b'\x00', b'')
-            file_handle.write(f'{device_name},{device_data.decode("utf-8", errors="ignore")}\n')
+            file_handle.write(f'{device_name.replace(",", ";")},{device_data.decode("utf-8", errors="ignore").replace(",", ";")}\n')
     return
 
 def process_values(

@@ -6,12 +6,12 @@ import os
 # Define the columns for the TreeGrid
 COLUMNS = [
     ("Timestamp", str),
-    ("Name", str),
-    ("Version", str),
-    ("Publisher", str),
-    ("Source", str),
-    ("RootDirPath", str),
-    ("UninstallString", str)
+    ("ModelName", str),
+    ("FriendlyName", str),
+    ("ModelNumber", str),
+    ("Manufacturer", str),
+    ("PrimaryCategory", str),
+    ("ModelID", str)
 ]
 
 def write_result_to_csv(
@@ -20,7 +20,7 @@ def write_result_to_csv(
     hive_list,
     key=None,
     hive_name=None,
-    output_path='regexplore/AmcacheInventoryApplication.csv'
+    output_path='regexplore/AmcacheInventoryDeviceContainer.csv'
     ):
     
     walker_options = {
@@ -35,7 +35,7 @@ def write_result_to_csv(
     os.makedirs('regexplore', exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as file_handle:
-        header = "Timestamp,Name,Version,Publisher,Source,RootDirPath,UninstallString\n"
+        header = "Timestamp,ModelName,FriendlyName,ModelNumber,Manufacturer,PrimaryCategory,ModelID\n"
         file_handle.write(header)
         entries = {}
         for subkey in _registry_walker(**walker_options):
@@ -56,13 +56,13 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},'
-                        f'{entries[registry_key].get("Name", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Version", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Publisher", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Source", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("RootDirPath", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("UninstallString", "").replace(",", ";")}\n'
+                        f'{entries[registry_key].get("Timestamp", "")},'
+                        f'{entries[registry_key].get("ModelName", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("FriendlyName", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("ModelNumber", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("Manufacturer", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("PrimaryCategory", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("ModelId", "").replace(",", ";")}\n'
                     )
                     entries = {}
     
@@ -115,12 +115,12 @@ def process_values(
                     0,
                     (
                         entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("Name", ""),
-                        entries[registry_key].get("Version", ""),
-                        entries[registry_key].get("Publisher", ""),
-                        entries[registry_key].get("Source", ""),
-                        entries[registry_key].get("RootDirPath", ""),
-                        entries[registry_key].get("UninstallString", ""),
+                        entries[registry_key].get("ModelName", ""),
+                        entries[registry_key].get("FriendlyName", ""),
+                        entries[registry_key].get("ModelNumber", ""),
+                        entries[registry_key].get("Manufacturer", ""),
+                        entries[registry_key].get("PrimaryCategory", ""),
+                        entries[registry_key].get("ModelId", ""),
                     ),
                 )
                 yield result
@@ -129,7 +129,7 @@ def process_values(
         except (KeyError, UnboundLocalError):
             continue
 
-def AmcacheInventoryApplication(
+def AmcacheInventoryDeviceContainer(
     _registry_walker,
     kernel,
     hive_list,
@@ -139,7 +139,7 @@ def AmcacheInventoryApplication(
     Create a TreeGrid with Programs data.
     """
     # Define the registry key and hive name to process
-    key = 'ROOT\InventoryApplication'
+    key = 'ROOT\InventoryDeviceContainer'
     hive_name = 'Amcache.hve'
 
     if file_output:

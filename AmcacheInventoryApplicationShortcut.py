@@ -30,7 +30,7 @@ def write_result_to_csv(
     os.makedirs('regexplore', exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as file_handle:
-        header = "Timestamp,Name,Version,Publisher,Source,RootDirPath,UninstallString\n"
+        header = "Timestamp,ShortcutPath\n"
         file_handle.write(header)
         entries = {}
         for subkey in _registry_walker(**walker_options):
@@ -51,7 +51,8 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},{entries[registry_key].get("ShortcutPath", "")},'
+                        f'{entries[registry_key]["Timestamp"]},'
+                        f'{entries[registry_key].get("ShortcutPath", "").replace(",", ";")}\n'
                     )
                     entries = {}
     

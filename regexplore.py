@@ -18,7 +18,7 @@ vollog = logging.getLogger(__name__)
 hive_list = []
 
 class regexplore(interfaces.plugins.PluginInterface):
-    """Lists the registry keys under a hive or specific key value."""
+    """Registry Explorer plugins from EZsuite to volatility3"""
 
     _required_framework_version = (2, 0, 0)
     _version = (1, 0, 0)
@@ -32,7 +32,10 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="keysset", description="Keys to extract and analyze {run_all, MountedDevices, AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut}", default=None, optional=False
+                name="keysset", description="Keys to extract and analyze {run_all, MountedDevices, " 
+                "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
+                " AmcacheInventoryDeviceContainer}"
+                , default=None, optional=False
             )
         ]
 
@@ -264,7 +267,8 @@ class regexplore(interfaces.plugins.PluginInterface):
             "MountedDevices": MountedDevices.MountedDevices,
             "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
             "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
-            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut
+            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut,
+            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer
         }
 
         hive_list = [

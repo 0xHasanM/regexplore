@@ -55,9 +55,13 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},{entries[registry_key].get("Path", "")},{entries[registry_key].get("Name", "")},'
-                        f'{entries[registry_key].get("Product", "")},{entries[registry_key].get("Publisher", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Version", "")},{entries[registry_key].get("SHA1", "")}\n'
+                        f'{entries[registry_key]["Timestamp"]},'
+                        f'{entries[registry_key].get("LowerCaseLongPath", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("Name", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("ProductName", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("Publisher", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("Version", "").replace(",", ";")},'
+                        f'{entries[registry_key].get("FileId", "").replace(",", ";")}\n'
                     )
                     entries = {}
     
