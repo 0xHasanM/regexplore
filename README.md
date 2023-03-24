@@ -17,6 +17,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 - `AmcacheInventoryApplicationFile`: parse Amcache.ve\InventoryApplicationFile keys
 - `AmcacheInventoryApplicationShortcut`: parse Amcache.ve\InventoryApplicationShortcut keys
 - `AmcacheInventoryDeviceContainer`: parse Amcache.ve\InventoryApplicationDeviceContainer keys
+- `AmcacheInventoryDevicePnp`: parse Amcache.ve\InventoryApplicationDevicePnp keys
 - `services`: Lists the services that are automatically started when the system boots up (to-do)
 - `devices`: Lists the connected devices on the system (to-do)
 - `userassist`: Lists the programs that have been run by the user (to-do)
