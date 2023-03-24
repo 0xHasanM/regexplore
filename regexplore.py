@@ -32,10 +32,14 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="keysset", description="Keys to extract and analyze {run_all, MountedDevices, " 
+                name="regplg", description="Specify plugin to run {run_all, MountedDevices, " 
                 "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
                 " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp}"
-                , default=None, optional=False
+                , default=None, optional=True
+            ),
+            requirements.StringRequirement(
+                name="hive", description="Specify hive to run all plugins related to that hive {SYSTEM, AMCACHE}"
+                , default=None, optional=True
             )
         ]
 
@@ -213,6 +217,19 @@ class regexplore(interfaces.plugins.PluginInterface):
                 )
                 yield result
 
+    def _hives_walker(
+        self, 
+        kernel,
+    ):
+    
+        for hive in hivelist.HiveList.list_hives(
+                self.context,
+                self.config_path,
+                layer_name=kernel.layer_name,
+                symbol_table=kernel.symbol_table_name
+        ):
+            yield hive
+
     def _registry_walker(
         self,
         layer_name: str,
@@ -261,40 +278,68 @@ class regexplore(interfaces.plugins.PluginInterface):
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
-        keysset = self.config.get("keysset", None)
-
+        regplg = self.config.get("regplg", None)
+        hive = self.config.get("hive", None)
+    
+        # Define module and hive mappings
         module_mapping = {
             "MountedDevices": MountedDevices.MountedDevices,
             "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
             "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
             "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut,
             "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer,
-            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp.AmcacheInventoryDevicePnp
+            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp.AmcacheInventoryDevicePnp,
+            "AmcacheInventoryDriverBinary": AmcacheInventoryDriverBinary.AmcacheInventoryDriverBinary
         }
-
-        hive_list = [
-            hive
-            for hive in hivelist.HiveList.list_hives(
-                self.context,
-                self.config_path,
-                layer_name=kernel.layer_name,
-                symbol_table=kernel.symbol_table_name
-            )
-        ]
-        
-        if keysset == 'run_all':
+        hive_mapping = {
+            "system": {
+                "MountedDevices": module_mapping["MountedDevices"]
+            },
+            "amcache": {
+                "AmcacheInventoryApplication": module_mapping["AmcacheInventoryApplication"],
+                "AmcacheInventoryApplicationFile": module_mapping["AmcacheInventoryApplicationFile"],
+                "AmcacheInventoryApplicationShortcut": module_mapping["AmcacheInventoryApplicationShortcut"],
+                "AmcacheInventoryDeviceContainer": module_mapping["AmcacheInventoryDeviceContainer"],
+                "AmcacheInventoryDevicePnp": module_mapping["AmcacheInventoryDevicePnp"],
+                "AmcacheInventoryDriverBinary": module_mapping["AmcacheInventoryDriverBinary"]
+            }
+        }
+    
+        # Get the list of hives using the generator function
+        hive_list = list(self._hives_walker(kernel))
+    
+        # Check if either hive or regplg is specified
+        if regplg and not hive:
+            if regplg == 'run_all':
+                return TreeGrid(
+                    columns=[
+                        ("Module name", str),
+                        ("Output path", str),
+                        ("Progress", str),
+                    ],
+                    generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list),
+                )
+            else:
+                if regplg not in module_mapping:
+                    allowed_values = ', '.join(module_mapping.keys())
+                    raise ValueError(f"Invalid regplg value. Allowed values are {allowed_values}")
+    
+                module_function = module_mapping[regplg]
+                return module_function(self._registry_walker, kernel, hive_list)
+    
+        elif hive and not regplg:
+            if hive.lower() not in hive_mapping:
+                allowed_values = ', '.join(hive_mapping.keys())
+                raise ValueError(f"Invalid hive value. Allowed values are {allowed_values}")
+    
             return TreeGrid(
                 columns=[
                     ("Module name", str),
                     ("Output path", str),
                     ("Progress", str),
                 ],
-                generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list),
+                generator=self.run_all(hive_mapping[hive.lower()], self._registry_walker, kernel, hive_list),
             )
+    
         else:
-            if keysset not in module_mapping:
-                allowed_values = ', '.join(module_mapping.keys())
-                raise ValueError(f"Invalid keysset value. Allowed values are {allowed_values}")
-
-            module_function = module_mapping[keysset]
-            return module_function(self._registry_walker, kernel, hive_list)
+                raise ValueError(f"You need to specify either hive or regplug")

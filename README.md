@@ -12,20 +12,27 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 ## Available Commands
 
+### regplg parameter
+- `run_all`: export all information in csv files to be feed to splunk, or TimeLineExplorer
 - `MountedDevices`: Lists mounted devices information
 - `AmcacheInventoryApplication`: parse Amcache.ve\InventoryApplication keys
 - `AmcacheInventoryApplicationFile`: parse Amcache.ve\InventoryApplicationFile keys
 - `AmcacheInventoryApplicationShortcut`: parse Amcache.ve\InventoryApplicationShortcut keys
 - `AmcacheInventoryDeviceContainer`: parse Amcache.ve\InventoryApplicationDeviceContainer keys
 - `AmcacheInventoryDevicePnp`: parse Amcache.ve\InventoryApplicationDevicePnp keys
+- `AmcacheInventoryDriverBinary`: parse Amcache.ve\InventoryDriverBinary keys
 - `services`: Lists the services that are automatically started when the system boots up (to-do)
 - `devices`: Lists the connected devices on the system (to-do)
 - `userassist`: Lists the programs that have been run by the user (to-do)
 - `mru`: Lists the most recently used files and applications (to-do)
 - `uninstall`: Lists the programs that have been uninstalled on the system (to-do)
 - `network`: Lists the network information and connections on the system (to-do)
-- `run_all`: export all information in csv files to be feed to splunk, or TimeLineExplorer (to-do)
-- `gui`: gui to go through the output of commands (to-do)
+- `http`: web server to go through the output of commands (to-do)
+
+### hive parameter
+- `SYSTEM`: run all plugins related to SYSTEM hive and extract information in respective csv files.
+- `Amcache`: run all plugins related to Amcache hive and extract information in respective csv files.
+
 ## Contributing
 
 If you find any issues or have suggestions for new features, please feel free to create an issue or submit a pull request. We appreciate your contributions and recommendations to improve the Regexplore plugin!
