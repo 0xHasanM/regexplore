@@ -51,7 +51,7 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},'
+                        f'{entries[registry_key].get("Timestamp", "")},'
                         f'{entries[registry_key].get("ShortcutPath", "").replace(",", ";")}\n'
                     )
                     entries = {}
@@ -105,7 +105,7 @@ def process_values(
                     0,
                     (
                         entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("ShortcutPath", ""),
+                        entries[registry_key].get("ShortcutPath", "").replace(",", ";"),
                     ),
                 )
                 yield result

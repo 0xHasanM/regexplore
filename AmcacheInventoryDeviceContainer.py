@@ -115,12 +115,12 @@ def process_values(
                     0,
                     (
                         entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("ModelName", ""),
-                        entries[registry_key].get("FriendlyName", ""),
-                        entries[registry_key].get("ModelNumber", ""),
-                        entries[registry_key].get("Manufacturer", ""),
-                        entries[registry_key].get("PrimaryCategory", ""),
-                        entries[registry_key].get("ModelId", ""),
+                        entries[registry_key].get("ModelName", "").replace(",", ";"),
+                        entries[registry_key].get("FriendlyName", "").replace(",", ";"),
+                        entries[registry_key].get("ModelNumber", "").replace(",", ";"),
+                        entries[registry_key].get("Manufacturer", "").replace(",", ";"),
+                        entries[registry_key].get("PrimaryCategory", "").replace(",", ";"),
+                        entries[registry_key].get("ModelId", "").replace(",", ";"),
                     ),
                 )
                 yield result

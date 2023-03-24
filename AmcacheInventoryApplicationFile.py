@@ -55,7 +55,7 @@ def write_result_to_csv(
                     # Convert the entry into a tuple and yield it
                 else:
                     file_handle.write(
-                        f'{entries[registry_key]["Timestamp"]},'
+                        f'{entries[registry_key].get("Timestamp", "")},'
                         f'{entries[registry_key].get("LowerCaseLongPath", "").replace(",", ";")},'
                         f'{entries[registry_key].get("Name", "").replace(",", ";")},'
                         f'{entries[registry_key].get("ProductName", "").replace(",", ";")},'
@@ -113,11 +113,11 @@ def process_values(
                     0,
                     (
                         entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("LowerCaseLongPath", ""),
-                        entries[registry_key].get("Name", ""),
-                        entries[registry_key].get("ProductName", ""),
-                        entries[registry_key].get("Publisher", ""),
-                        entries[registry_key].get("Version", ""),
+                        entries[registry_key].get("LowerCaseLongPath", "").replace(",", ";"),
+                        entries[registry_key].get("Name", "").replace(",", ";"),
+                        entries[registry_key].get("ProductName", "").replace(",", ";"),
+                        entries[registry_key].get("Publisher", "").replace(",", ";"),
+                        entries[registry_key].get("Version", "").replace(",", ";"),
                         str(entries[registry_key].get("FileId", "")).lstrip('0000')
                     ),
                 )

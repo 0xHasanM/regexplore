@@ -34,7 +34,7 @@ class regexplore(interfaces.plugins.PluginInterface):
             requirements.StringRequirement(
                 name="keysset", description="Keys to extract and analyze {run_all, MountedDevices, " 
                 "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
-                " AmcacheInventoryDeviceContainer}"
+                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp}"
                 , default=None, optional=False
             )
         ]
@@ -268,7 +268,8 @@ class regexplore(interfaces.plugins.PluginInterface):
             "AmcacheInventoryApplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
             "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
             "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut,
-            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer
+            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer,
+            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp.AmcacheInventoryDevicePnp
         }
 
         hive_list = [

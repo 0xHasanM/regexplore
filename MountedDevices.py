@@ -64,7 +64,7 @@ def process_values(
             0,
             (
                 device_name,
-                device_data.decode('utf-8', errors='ignore')
+                device_data.decode('utf-8', errors='ignore').replace(",", ";")
             ),
         )
         yield result
