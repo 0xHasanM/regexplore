@@ -1,6 +1,6 @@
 # Regexplore
 
-Regexplore is a Volatility plugin designed to mimic the functionality of the Registry Explorer plugins in EZsuite. It allows users to list different types of registry information in memory, such as runkeys, connected devices, and more.
+Regexplore is a Volatility plugin designed to mimic the functionality of the Registry Explorer plugins in EZsuite and regripper plugins in volatility. It allows users to list different types of registry information in memory, such as runkeys, connected devices, and more.
 
 ## Usage
 
@@ -8,7 +8,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 2. Run the plugin using the command `python vol.py windows.registry.regexplore -h` to display the available options and commands.
 
-![image](https://user-images.githubusercontent.com/51376376/226187226-374b9d53-026e-43d6-8b87-e7cce2170779.png)
+![image](https://user-images.githubusercontent.com/51376376/227634534-0801b47a-95be-45a9-ba1b-20e8954da444.png)
 
 ## Available Commands
 
