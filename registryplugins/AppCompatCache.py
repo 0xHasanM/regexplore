@@ -25,42 +25,43 @@ def write_result_to_csv(
     
     os.makedirs('regexplore', exist_ok=True)
     
-    paths_set = set()
-    
     with open(output_path, 'w', encoding='utf-8') as file_handle:
         header = 'ControlSet,CacheEntryPosition,Path,LastModifiedTimeUTC,Executed,Duplicate\n'
         file_handle.write(header)
-        for i in range(1,10):
-            try:
-                walker_options = {
-                    'layer_name': kernel.layer_name,
-                    'symbol_table': kernel.symbol_table_name,
-                    'hive_list': hive_list,
-                    'key': key.replace('<set>', str(i)),
-                    'hive_name': hive_name,
-                    'recurse': False,
-                }
-                
-                controlSetId = i
-                
-                if kernel.get_type("pointer").size == 4:
-                    is32bit = "x86"
-                else:
-                    is32bit = False
-                for value in _registry_walker(**walker_options):
-                    if str(value[1][2]) == "AppCompatCache":
-                        rawBytes = value[1][3]
-                        for result in AppCompatCacheParser(rawBytes, is32bit, controlSetId):
-                            if result[2] in paths_set:
-                                result += ('TRUE', )
-                            else:
-                                result += ('FALSE', )
-                                paths_set.add(result[2])
-                            file_handle.write(f'{result[0]},{result[1]},{result[2]},{result[3]},{result[4]},{result[5]}\n')
-            except Exception as e:
-                print(e)
+        for result in process_values(
+            _registry_walker,
+            kernel,
+            hive_list,
+            key,
+            hive_name
+        ):
+            file_handle.write(f'{result[0]},{result[1]},{result[2]},{result[3]},{result[4]},{result[5]}\n')
     return
-
+    
+def ValuesOut(
+    _registry_walker,
+    kernel,
+    hive_list,
+    key=None,
+    hive_name=None,
+    file_output=False
+    ):
+    
+    for result in process_values(
+            _registry_walker,
+            kernel,
+            hive_list,
+            key,
+            hive_name
+        ):
+        
+            yield (
+                0,
+                (
+                    result
+                ),
+            )
+            
 def process_values(
     _registry_walker,
     kernel,
@@ -101,19 +102,14 @@ def process_values(
                         else:
                             result += ('FALSE', )
                             paths_set.add(result[2])
-                        yield (
-                            0,
-                            (
-                                result
-                            ),
-                        )
+                        yield result
         except Exception as e:
             print(e)
 def AppCompatCacheParser(rawBytes, is32bit, controlSetId):
     
     sigNum = int.from_bytes(rawBytes[:4], byteorder='little', signed=False)
     signature = rawBytes[128:132].decode('ascii')
-    print(hex(sigNum))
+
     if sigNum == 0xDEADBEEF and is32bit: #XP
         for result in WindowsXP.WindowsXP(rawBytes, is32bit, controlSetId):
             yield result
@@ -155,7 +151,7 @@ def AppCompatCache(
         )
         return
     else:
-        generator = process_values(
+        generator = ValuesOut(
             _registry_walker,
             kernel,
             hive_list,

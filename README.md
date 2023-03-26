@@ -8,7 +8,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 2. Run the plugin using the command `python vol.py windows.registry.regexplore -h` to display the available options and commands.
 
-![image](https://user-images.githubusercontent.com/51376376/227634534-0801b47a-95be-45a9-ba1b-20e8954da444.png)
+![image](https://user-images.githubusercontent.com/51376376/226187226-374b9d53-026e-43d6-8b87-e7cce2170779.png)
 
 ## Available Commands
 
@@ -22,13 +22,14 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 - `AmcacheInventoryDevicePnp`: parse Amcache.ve\InventoryApplicationDevicePnp keys
 - `AmcacheInventoryDriverBinary`: parse Amcache.ve\InventoryDriverBinary keys
 - `AppCompatCache`: parse AppCompatCache value
+- `AppPaths`: parse AppPaths keys
 - `services`: Lists the services that are automatically started when the system boots up (to-do)
 - `devices`: Lists the connected devices on the system (to-do)
 - `userassist`: Lists the programs that have been run by the user (to-do)
 - `mru`: Lists the most recently used files and applications (to-do)
 - `uninstall`: Lists the programs that have been uninstalled on the system (to-do)
 - `network`: Lists the network information and connections on the system (to-do)
-- `http`: web server to go through the output of commands (to-do)
+- `html`: html output (to-do)
 
 ### hive parameter
 - `SYSTEM`: run all plugins related to SYSTEM hive and extract information in respective csv files.

@@ -34,7 +34,7 @@ class regexplore(interfaces.plugins.PluginInterface):
             requirements.StringRequirement(
                 name="regplg", description="Specify plugin to run {run_all, MountedDevices, " 
                 "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
-                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp, AppCompatCache}"
+                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp, AppCompatCache, AppPaths}"
                 , default=None, optional=True
             ),
             requirements.StringRequirement(
@@ -278,7 +278,7 @@ class regexplore(interfaces.plugins.PluginInterface):
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
-        regplg = self.config.get("regplg", None).lower()
+        regplg = self.config.get("regplg", None)
         hive = self.config.get("hive", None)
 
         # Define module and hive mappings
@@ -291,11 +291,13 @@ class regexplore(interfaces.plugins.PluginInterface):
             "amcacheinventorydevicepnp": AmcacheInventoryDevicePnp,
             "amcacheinventorydriverbinary": AmcacheInventoryDriverBinary,
             "appcompatcache": AppCompatCache,
+            "apppaths": AppPaths,
         }
         hive_mapping = {
             "system": {
                 "mounteddevices": module_mapping["mounteddevices"],
                 "appcompatcache": module_mapping["appcompatcache"],
+                "apppaths": module_mapping["apppaths"]
             },
             "amcache": {
                 "amcacheinventoryapplication": module_mapping["amcacheinventoryapplication"],
@@ -304,6 +306,9 @@ class regexplore(interfaces.plugins.PluginInterface):
                 "amcacheinventorydevicecontainer": module_mapping["amcacheinventorydevicecontainer"],
                 "amcacheinventorydevicepnp": module_mapping["amcacheinventorydevicepnp"],
                 "amcacheinventorydriverbinary": module_mapping["amcacheinventorydriverbinary"],
+            },
+            "ntuser": {
+                "apppaths": module_mapping["apppaths"]
             }
         }
     
@@ -312,7 +317,7 @@ class regexplore(interfaces.plugins.PluginInterface):
     
         # Check if either hive or regplg is specified
         if regplg and not hive:
-            if regplg == 'run_all':
+            if regplg.lower() == 'run_all':
                 return TreeGrid(
                     columns=[
                         ("Module name", str),
@@ -322,11 +327,11 @@ class regexplore(interfaces.plugins.PluginInterface):
                     generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list),
                 )
             else:
-                if regplg not in module_mapping:
+                if regplg.lower() not in module_mapping:
                     allowed_values = ', '.join(module_mapping.keys())
                     raise ValueError(f"Invalid regplg value. Allowed values are {allowed_values}")
     
-                module_function = module_mapping[regplg]
+                module_function = module_mapping[regplg.lower()]
                 return module_function(self._registry_walker, kernel, hive_list)
     
         elif hive and not regplg:

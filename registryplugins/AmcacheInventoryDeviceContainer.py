@@ -34,42 +34,65 @@ def write_result_to_csv(
     
     os.makedirs('regexplore', exist_ok=True)
     
+    entries = process_values(
+            _registry_walker,
+            kernel,
+            hive_list,
+            key,
+            hive_name
+        )
+    
     with open(output_path, 'w', encoding='utf-8') as file_handle:
         header = "Timestamp,ModelName,FriendlyName,ModelNumber,Manufacturer,PrimaryCategory,ModelID\n"
         file_handle.write(header)
-        entries = {}
-        for subkey in _registry_walker(**walker_options):
-            try:
-                # Only process values, not keys
-                if str(subkey[1][2]) != 'Key':
-                    registry_key = subkey[1][1]
-                    registry_value = subkey[1][2]
-                    registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
-    
-                    # Initialize the registry key entry if it doesn't exist
-                    if registry_key not in entries:
-                        entries[registry_key] = {'Timestamp': str(subkey[1][0])}
-    
-                    # Store the registry value and data
-                    entries[registry_key][registry_value] = registry_data
-    
-                    # Convert the entry into a tuple and yield it
-                else:
-                    file_handle.write(
-                        f'{entries[registry_key].get("Timestamp", "")},'
-                        f'{entries[registry_key].get("ModelName", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("FriendlyName", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("ModelNumber", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("Manufacturer", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("PrimaryCategory", "").replace(",", ";")},'
-                        f'{entries[registry_key].get("ModelId", "").replace(",", ";")}\n'
-                    )
-                    entries = {}
-    
-            except (KeyError, UnboundLocalError):
+        for registry_key in entries.keys():
+            if entries[registry_key].get("ModelName", "") == "":
                 continue
+            file_handle.write(
+                f'{entries[registry_key].get("Timestamp", "")},'
+                f'{entries[registry_key].get("ModelName", "").replace(",", ";")},'
+                f'{entries[registry_key].get("FriendlyName", "").replace(",", ";")},'
+                f'{entries[registry_key].get("ModelNumber", "").replace(",", ";")},'
+                f'{entries[registry_key].get("Manufacturer", "").replace(",", ";")},'
+                f'{entries[registry_key].get("PrimaryCategory", "").replace(",", ";")},'
+                f'{entries[registry_key].get("ModelId", "").replace(",", ";")}\n'
+            )
+
     return
-    
+
+def ValuesOut(
+    _registry_walker,
+    kernel,
+    hive_list,
+    key,
+    hive_name
+    ):
+
+    entries = process_values(
+            _registry_walker,
+            kernel,
+            hive_list,
+            key,
+            hive_name
+        )
+        
+    for registry_key in entries.keys():
+        if entries[registry_key].get("ModelName", "") == "":
+            continue
+        result = (
+            0,
+            (
+                entries[registry_key].get("Timestamp", ""),
+                entries[registry_key].get("ModelName", "").replace(",", ";"),
+                entries[registry_key].get("FriendlyName", "").replace(",", ";"),
+                entries[registry_key].get("ModelNumber", "").replace(",", ";"),
+                entries[registry_key].get("Manufacturer", "").replace(",", ";"),
+                entries[registry_key].get("PrimaryCategory", "").replace(",", ";"),
+                entries[registry_key].get("ModelId", "").replace(",", ";"),
+            ),
+        )
+        yield result
+
 def process_values(
     _registry_walker,
     kernel,
@@ -95,39 +118,20 @@ def process_values(
     # Iterate through the registry walker output
     entries = {}
     for subkey in _registry_walker(**walker_options):
-        try:
-            # Only process values, not keys
-            if str(subkey[1][2]) != 'Key':
-                registry_key = subkey[1][1]
-                registry_value = subkey[1][2]
+        # Only process values, not keys
+        if str(subkey[1][2]) != 'Key':
+            registry_key = subkey[1][1]
+            registry_value = subkey[1][2]
+            try:
                 registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
-
-                # Initialize the registry key entry if it doesn't exist
-                if registry_key not in entries:
-                    entries[registry_key] = {'Timestamp': str(subkey[1][0])}
-
-                # Store the registry value and data
-                entries[registry_key][registry_value] = registry_data
-
-                # Convert the entry into a tuple and yield it
-            else:
-                result = (
-                    0,
-                    (
-                        entries[registry_key].get("Timestamp", ""),
-                        entries[registry_key].get("ModelName", "").replace(",", ";"),
-                        entries[registry_key].get("FriendlyName", "").replace(",", ";"),
-                        entries[registry_key].get("ModelNumber", "").replace(",", ";"),
-                        entries[registry_key].get("Manufacturer", "").replace(",", ";"),
-                        entries[registry_key].get("PrimaryCategory", "").replace(",", ";"),
-                        entries[registry_key].get("ModelId", "").replace(",", ";"),
-                    ),
-                )
-                yield result
-                entries = {}
-
-        except (KeyError, UnboundLocalError):
-            continue
+            except:
+                continue
+            # Initialize the registry key entry if it doesn't exist
+            if registry_key not in entries:
+                entries[registry_key] = {'Timestamp': str(subkey[1][0])}
+            # Store the registry value and data
+            entries[registry_key][registry_value] = registry_data
+    return entries
 
 def AmcacheInventoryDeviceContainer(
     _registry_walker,
@@ -152,7 +156,7 @@ def AmcacheInventoryDeviceContainer(
         )
         return
     else:
-        generator = process_values(
+        generator = ValuesOut(
             _registry_walker,
             kernel,
             hive_list,
