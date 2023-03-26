@@ -34,7 +34,7 @@ class regexplore(interfaces.plugins.PluginInterface):
             requirements.StringRequirement(
                 name="regplg", description="Specify plugin to run {run_all, MountedDevices, " 
                 "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
-                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp}"
+                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp, AppCompatCache}"
                 , default=None, optional=True
             ),
             requirements.StringRequirement(
@@ -278,30 +278,32 @@ class regexplore(interfaces.plugins.PluginInterface):
 
     def run(self):
         kernel = self.context.modules[self.config["kernel"]]
-        regplg = self.config.get("regplg", None)
+        regplg = self.config.get("regplg", None).lower()
         hive = self.config.get("hive", None)
-    
+
         # Define module and hive mappings
         module_mapping = {
-            "MountedDevices": MountedDevices,
-            "AmcacheInventoryApplication": AmcacheInventoryApplication,
-            "AmcacheInventoryApplicationFile": AmcacheInventoryApplicationFile,
-            "AmcacheInventoryApplicationShortcut": AmcacheInventoryApplicationShortcut,
-            "AmcacheInventoryDeviceContainer": AmcacheInventoryDeviceContainer,
-            "AmcacheInventoryDevicePnp": AmcacheInventoryDevicePnp,
-            "AmcacheInventoryDriverBinary": AmcacheInventoryDriverBinary
+            "mounteddevices": MountedDevices,
+            "amcacheinventoryapplication": AmcacheInventoryApplication,
+            "amcacheinventoryapplicationfile": AmcacheInventoryApplicationFile,
+            "amcacheinventoryapplicationshortcut": AmcacheInventoryApplicationShortcut,
+            "amcacheinventorydevicecontainer": AmcacheInventoryDeviceContainer,
+            "amcacheinventorydevicepnp": AmcacheInventoryDevicePnp,
+            "amcacheinventorydriverbinary": AmcacheInventoryDriverBinary,
+            "appcompatcache": AppCompatCache,
         }
         hive_mapping = {
             "system": {
-                "MountedDevices": module_mapping["MountedDevices"]
+                "mounteddevices": module_mapping["mounteddevices"],
+                "appcompatcache": module_mapping["appcompatcache"],
             },
             "amcache": {
-                "AmcacheInventoryApplication": module_mapping["AmcacheInventoryApplication"],
-                "AmcacheInventoryApplicationFile": module_mapping["AmcacheInventoryApplicationFile"],
-                "AmcacheInventoryApplicationShortcut": module_mapping["AmcacheInventoryApplicationShortcut"],
-                "AmcacheInventoryDeviceContainer": module_mapping["AmcacheInventoryDeviceContainer"],
-                "AmcacheInventoryDevicePnp": module_mapping["AmcacheInventoryDevicePnp"],
-                "AmcacheInventoryDriverBinary": module_mapping["AmcacheInventoryDriverBinary"]
+                "amcacheinventoryapplication": module_mapping["amcacheinventoryapplication"],
+                "amcacheinventoryapplicationfile": module_mapping["amcacheinventoryapplicationfile"],
+                "amcacheinventoryapplicationshortcut": module_mapping["amcacheinventoryapplicationshortcut"],
+                "amcacheinventorydevicecontainer": module_mapping["amcacheinventorydevicecontainer"],
+                "amcacheinventorydevicepnp": module_mapping["amcacheinventorydevicepnp"],
+                "amcacheinventorydriverbinary": module_mapping["amcacheinventorydriverbinary"],
             }
         }
     

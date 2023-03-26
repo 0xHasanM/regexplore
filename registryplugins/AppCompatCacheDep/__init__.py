@@ -1,0 +1,5 @@
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCacheDep import Windows10
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCacheDep import Windows7
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCacheDep import WindowsXP
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCacheDep import VistaWin2k3Win2k8
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCacheDep import Windows8

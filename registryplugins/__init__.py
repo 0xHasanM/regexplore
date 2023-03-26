@@ -5,3 +5,4 @@ from volatility3.plugins.windows.registry.regexplore.registryplugins.AmcacheInve
 from volatility3.plugins.windows.registry.regexplore.registryplugins.AmcacheInventoryDeviceContainer import AmcacheInventoryDeviceContainer
 from volatility3.plugins.windows.registry.regexplore.registryplugins.AmcacheInventoryDevicePnp import AmcacheInventoryDevicePnp
 from volatility3.plugins.windows.registry.regexplore.registryplugins.AmcacheInventoryDriverBinary import AmcacheInventoryDriverBinary
+from volatility3.plugins.windows.registry.regexplore.registryplugins.AppCompatCache import AppCompatCache
