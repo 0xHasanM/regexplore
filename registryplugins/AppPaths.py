@@ -33,7 +33,7 @@ def write_result_to_csv(
         for registry_key in entries.keys():
                         file_handle.write(
                             f'{entries[registry_key].get("Timestamp", "")},'
-                            f'{hive_name},'
+                            f'{entries[registry_key].get("hive_name", "")},'
                             f'{registry_key},'
                             f'{entries[registry_key].get("(Default)", "")},'
                             f'{entries[registry_key].get("Path", "")}\n'
@@ -60,7 +60,7 @@ def ValuesOut(
             0,
             (
                 entries[registry_key].get("Timestamp", ""),
-                entries[registry_key]['hive_name'],
+                entries[registry_key].get('hive_name', ''),
                 registry_key,
                 entries[registry_key].get("(Default)", ""),
                 entries[registry_key].get("Path", ""),
@@ -110,16 +110,26 @@ def AppPaths(
     _registry_walker,
     kernel,
     hive_list,
+    hive = None,
     file_output=False
     ):
     """
     Create a TreeGrid with device name and data.
     """
-    keys_hive_mapping = {
-        'SYSTEM':'Microsoft\Windows\CurrentVersion\App Paths',
-        'ntuser':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
-    }
-    
+    if hive == "system":
+        keys_hive_mapping = {
+            'SYSTEM':'Microsoft\Windows\CurrentVersion\App Paths'
+        }
+    elif hive == "ntuser":
+        keys_hive_mapping = {
+            'ntuser':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
+        }
+    else:
+        keys_hive_mapping = {
+            'SYSTEM':'Microsoft\Windows\CurrentVersion\App Paths',
+            'ntuser':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
+        }
+        
     if file_output:
         write_result_to_csv(
             _registry_walker,

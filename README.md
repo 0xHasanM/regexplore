@@ -34,6 +34,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 ### hive parameter
 - `SYSTEM`: run all plugins related to SYSTEM hive and extract information in respective csv files.
 - `Amcache`: run all plugins related to Amcache hive and extract information in respective csv files.
+- `NTUSER`: run all plugins related to NTUSER.dat hive and extract information in respective csv files.
 
 ## Contributing
 

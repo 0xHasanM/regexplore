@@ -115,6 +115,7 @@ def AmcacheInventoryApplicationShortcut(
     _registry_walker,
     kernel,
     hive_list,
+    hive = None,
     file_output=False
     ):
     """

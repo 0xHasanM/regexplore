@@ -38,7 +38,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                 , default=None, optional=True
             ),
             requirements.StringRequirement(
-                name="hive", description="Specify hive to run all plugins related to that hive {SYSTEM, AMCACHE}"
+                name="hive", description="Specify hive to run all plugins related to that hive {SYSTEM, AMCACHE, NTUSER}"
                 , default=None, optional=True
             )
         ]
@@ -269,11 +269,12 @@ class regexplore(interfaces.plugins.PluginInterface):
         _registry_walker,
         kernel,
         hive_list: List[hivelist.HiveList],
+        hive,
     ):
         progress = 0
         for module_name, module_function in module_mapping.items():
             progress += 1
-            module_function(_registry_walker, kernel, hive_list=hive_list, file_output=True)
+            module_function(_registry_walker, kernel, hive_list=hive_list, hive=hive, file_output=True)
             yield (0, (module_name, f'regexplore/{module_name}.csv', f'{progress}/{len(module_mapping)}'))
 
     def run(self):
@@ -345,7 +346,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                     ("Output path", str),
                     ("Progress", str),
                 ],
-                generator=self.run_all(hive_mapping[hive.lower()], self._registry_walker, kernel, hive_list),
+                generator=self.run_all(hive_mapping[hive.lower()], self._registry_walker, kernel, hive_list, hive),
             )
     
         else:
