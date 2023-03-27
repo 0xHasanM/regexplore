@@ -76,13 +76,13 @@ def process_values(
     """
     paths_set = set()
     
-    for i in range(1,10):
+    for i in range(1,5):
         try:
             walker_options = {
                 'layer_name': kernel.layer_name,
                 'symbol_table': kernel.symbol_table_name,
                 'hive_list': hive_list,
-                'key': key.replace('<set>', str(i)),
+                'key': key.replace('*', str(i)),
                 'hive_name': hive_name,
                 'recurse': False,
             }
@@ -139,7 +139,7 @@ def AppCompatCache(
     """
     Create a TreeGrid with device name and data.
     """
-    key = 'ControlSet00<set>\Control\Session Manager\AppCompatCache'
+    key = 'ControlSet00*\Control\Session Manager\AppCompatCache'
     hive_name = 'SYSTEM'
     
     if file_output:

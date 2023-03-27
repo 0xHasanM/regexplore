@@ -32,13 +32,13 @@ class regexplore(interfaces.plugins.PluginInterface):
                 architectures=["Intel32", "Intel64"],
             ),
             requirements.StringRequirement(
-                name="regplg", description="Specify plugin to run {run_all, MountedDevices, " 
-                "AmcacheInventoryApplication, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
-                " AmcacheInventoryDeviceContainer, AmcacheInventoryInventoryDevicePnp, AppCompatCache, AppPaths}"
+                name="regplg", description="Specify plugin to run {run_all, MountedDevices, AmcacheInventoryApplication" 
+                "AmcacheInventoryDeviceContainer, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
+                "AmcacheInventoryInventoryDevicePnp, AppCompatCache, AppPaths, BamDam}"
                 , default=None, optional=True
             ),
             requirements.StringRequirement(
-                name="hive", description="Specify hive to run all plugins related to that hive {SYSTEM, AMCACHE, NTUSER}"
+                name="hive", description="Specify hive to run all plugins related to that hive {SYSTEM, AMCACHE, NTUSER, SOFTWARE}"
                 , default=None, optional=True
             )
         ]
@@ -221,14 +221,15 @@ class regexplore(interfaces.plugins.PluginInterface):
         self, 
         kernel,
     ):
-    
+        hives = {}
         for hive in hivelist.HiveList.list_hives(
                 self.context,
                 self.config_path,
                 layer_name=kernel.layer_name,
                 symbol_table=kernel.symbol_table_name
         ):
-            yield hive
+            hives[hive.get_name()] = hive
+        return hives
 
     def _registry_walker(
         self,
@@ -239,18 +240,17 @@ class regexplore(interfaces.plugins.PluginInterface):
         hive_name: str = None,
         recurse: bool = False,
     ):
-
-        for hive in hive_list:
-            if hive_name.lower() in hive.get_name().lower():
+    
+        for hive_path in [hive for hive in hive_list.keys() if hive_name.lower() in hive.split('\\')[-1].lower()]:
+            try:
                 try:
-                    node_path = hive.get_key(key, return_list=True) if key else [hive.get_node(hive.root_cell_offset)]
-
-                    for x, y in self._printkey_iterator(hive, node_path, recurse=recurse):
-                        yield (x - len(node_path), y)
-                except (exceptions.InvalidAddressException, KeyError, RegistryFormatException) as excp:
-                    self.handle_exceptions(excp, key, hive)
-            else:
-                continue
+                    node_path = hive_list[hive_path].get_key(key, return_list=True) if key else [hive_list[hive_path].get_node(hive.root_cell_offset)]
+                except:
+                    continue
+                for x, y in self._printkey_iterator(hive_list[hive_path], node_path, recurse=recurse):
+                    yield (x - len(node_path), y, hive_path)
+            except (exceptions.InvalidAddressException, KeyError, RegistryFormatException) as excp:
+                self.handle_exceptions(excp, key, hive_list[hive_path])
 
     @staticmethod
     def handle_exceptions(exception: Exception, key: str, hive: hivelist.HiveList) -> None:
@@ -284,21 +284,26 @@ class regexplore(interfaces.plugins.PluginInterface):
 
         # Define module and hive mappings
         module_mapping = {
-            "mounteddevices": MountedDevices,
-            "amcacheinventoryapplication": AmcacheInventoryApplication,
-            "amcacheinventoryapplicationfile": AmcacheInventoryApplicationFile,
-            "amcacheinventoryapplicationshortcut": AmcacheInventoryApplicationShortcut,
-            "amcacheinventorydevicecontainer": AmcacheInventoryDeviceContainer,
-            "amcacheinventorydevicepnp": AmcacheInventoryDevicePnp,
-            "amcacheinventorydriverbinary": AmcacheInventoryDriverBinary,
-            "appcompatcache": AppCompatCache,
-            "apppaths": AppPaths,
+            "mounteddevices": MountedDevices.MountedDevices,
+            "amcacheinventoryapplication": AmcacheInventoryApplication.AmcacheInventoryApplication,
+            "amcacheinventoryapplicationfile": AmcacheInventoryApplicationFile.AmcacheInventoryApplicationFile,
+            "amcacheinventoryapplicationshortcut": AmcacheInventoryApplicationShortcut.AmcacheInventoryApplicationShortcut,
+            "amcacheinventorydevicecontainer": AmcacheInventoryDeviceContainer.AmcacheInventoryDeviceContainer,
+            "amcacheinventorydevicepnp": AmcacheInventoryDevicePnp.AmcacheInventoryDevicePnp,
+            "amcacheinventorydriverbinary": AmcacheInventoryDriverBinary.AmcacheInventoryDriverBinary,
+            "appcompatcache": AppCompatCache.AppCompatCache,
+            "apppaths": AppPaths.AppPaths,
+            "bamdam": BamDam.BamDam
         }
+        
         hive_mapping = {
             "system": {
                 "mounteddevices": module_mapping["mounteddevices"],
                 "appcompatcache": module_mapping["appcompatcache"],
-                "apppaths": module_mapping["apppaths"]
+                "bamdam": module_mapping["bamdam"]
+            },
+            "software": {
+                "apppaths": module_mapping["apppaths"],
             },
             "amcache": {
                 "amcacheinventoryapplication": module_mapping["amcacheinventoryapplication"],
@@ -314,8 +319,7 @@ class regexplore(interfaces.plugins.PluginInterface):
         }
     
         # Get the list of hives using the generator function
-        hive_list = list(self._hives_walker(kernel))
-    
+        hive_list = self._hives_walker(kernel)
         # Check if either hive or regplg is specified
         if regplg and not hive:
             if regplg.lower() == 'run_all':
@@ -325,7 +329,7 @@ class regexplore(interfaces.plugins.PluginInterface):
                         ("Output path", str),
                         ("Progress", str),
                     ],
-                    generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list),
+                    generator=self.run_all(module_mapping, self._registry_walker, kernel, hive_list, hive),
                 )
             else:
                 if regplg.lower() not in module_mapping:
@@ -350,4 +354,4 @@ class regexplore(interfaces.plugins.PluginInterface):
             )
     
         else:
-                raise ValueError(f"You need to specify either hive or regplug")
+                raise ValueError(f"You need to specify either hive or regplg")

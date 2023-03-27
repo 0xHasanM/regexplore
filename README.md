@@ -14,15 +14,16 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 ### regplg parameter
 - `run_all`: export all information in csv files to be feed to splunk, or TimeLineExplorer
-- `MountedDevices`: Lists mounted devices information
-- `AmcacheInventoryApplication`: parse Amcache.ve\InventoryApplication keys
-- `AmcacheInventoryApplicationFile`: parse Amcache.ve\InventoryApplicationFile keys
-- `AmcacheInventoryApplicationShortcut`: parse Amcache.ve\InventoryApplicationShortcut keys
-- `AmcacheInventoryDeviceContainer`: parse Amcache.ve\InventoryApplicationDeviceContainer keys
-- `AmcacheInventoryDevicePnp`: parse Amcache.ve\InventoryApplicationDevicePnp keys
-- `AmcacheInventoryDriverBinary`: parse Amcache.ve\InventoryDriverBinary keys
-- `AppCompatCache`: parse AppCompatCache value
-- `AppPaths`: parse AppPaths keys
+- `MountedDevices`: Displays mounted devices including GUIDs and device information
+- `AmcacheInventoryApplication`: Amcache-InventoryApplication
+- `AmcacheInventoryApplicationFile`: Amcache-InventoryApplicationFile
+- `AmcacheInventoryApplicationShortcut`: Amcache-InventoryApplicationShortcut
+- `AmcacheInventoryDeviceContainer`: Amcache-InventoryApplicationDeviceContainer
+- `AmcacheInventoryDevicePnp`: Amcache-InventoryApplicationDevicePnp
+- `AmcacheInventoryDriverBinary`: Amcache-InventoryApplicationDriverBinary
+- `AppCompatCache`: Tracks application compatibility. The cache data tracks file path, size, and last modified time. In some cases, an executed flag is also available.
+- `AppPaths`: AppPaths Information
+- `BamDam`: Extracts program information and last run times from bam and dam keys
 - `services`: Lists the services that are automatically started when the system boots up (to-do)
 - `devices`: Lists the connected devices on the system (to-do)
 - `userassist`: Lists the programs that have been run by the user (to-do)
@@ -33,6 +34,7 @@ Regexplore is a Volatility plugin designed to mimic the functionality of the Reg
 
 ### hive parameter
 - `SYSTEM`: run all plugins related to SYSTEM hive and extract information in respective csv files.
+- `SOFTWARE`: run all plugins related to SOFTWARE hive and extract information in respective csv files.
 - `Amcache`: run all plugins related to Amcache hive and extract information in respective csv files.
 - `NTUSER`: run all plugins related to NTUSER.dat hive and extract information in respective csv files.
 

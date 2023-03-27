@@ -33,7 +33,7 @@ def write_result_to_csv(
         for registry_key in entries.keys():
                         file_handle.write(
                             f'{entries[registry_key].get("Timestamp", "")},'
-                            f'{entries[registry_key].get("hive_name", "")},'
+                            f'{entries[registry_key].get("hive_path", "")},'
                             f'{registry_key},'
                             f'{entries[registry_key].get("(Default)", "")},'
                             f'{entries[registry_key].get("Path", "")}\n'
@@ -60,7 +60,7 @@ def ValuesOut(
             0,
             (
                 entries[registry_key].get("Timestamp", ""),
-                entries[registry_key].get('hive_name', ''),
+                entries[registry_key].get('hive_path', ''),
                 registry_key,
                 entries[registry_key].get("(Default)", ""),
                 entries[registry_key].get("Path", ""),
@@ -91,17 +91,17 @@ def process_values(
         }
         for subkey in _registry_walker(**walker_options):
             if str(subkey[1][2]) != 'Key':
+                hive_path = subkey[2]
                 registry_key = subkey[1][1]
                 registry_value = subkey[1][2]
                 try:
                     registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
                 except:
                     continue
-    
                 # Initialize the registry key entry if it doesn't exist
                 if registry_key not in entries:
                     entries[registry_key] = {'Timestamp': str(subkey[1][0])}
-                    entries[registry_key]['hive_name'] = hive_name
+                    entries[registry_key]['hive_path'] = hive_path
                 entries[registry_key][registry_value] = registry_data
                 # Store the registry value and data
     return entries
@@ -116,20 +116,21 @@ def AppPaths(
     """
     Create a TreeGrid with device name and data.
     """
-    if hive == "system":
-        keys_hive_mapping = {
-            'SYSTEM':'Microsoft\Windows\CurrentVersion\App Paths'
-        }
-    elif hive == "ntuser":
-        keys_hive_mapping = {
-            'ntuser':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
-        }
+    if hive != None:
+        if hive == "SOFTWARE":
+            keys_hive_mapping = {
+                'SOFTWARE':'Microsoft\Windows\CurrentVersion\App Paths'
+            }
+        elif hive == "ntuser":
+            keys_hive_mapping = {
+                'ntuser.dat':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
+            }
     else:
         keys_hive_mapping = {
-            'SYSTEM':'Microsoft\Windows\CurrentVersion\App Paths',
-            'ntuser':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
+            'SOFTWARE':'Microsoft\Windows\CurrentVersion\App Paths',
+            'ntuser.dat':'SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths'
         }
-        
+    
     if file_output:
         write_result_to_csv(
             _registry_walker,
