@@ -34,7 +34,7 @@ class regexplore(interfaces.plugins.PluginInterface):
             requirements.StringRequirement(
                 name="regplg", description="Specify plugin to run {run_all, MountedDevices, AmcacheInventoryApplication" 
                 "AmcacheInventoryDeviceContainer, AmcacheInventoryApplicationFile, AmcacheInventoryApplicationShortcut,"
-                "AmcacheInventoryInventoryDevicePnp, AppCompatCache, AppPaths, BamDam}"
+                "AmcacheInventoryInventoryDevicePnp, AppCompatCache, AppPaths, BamDam, CIDSizeMRU}"
                 , default=None, optional=True
             ),
             requirements.StringRequirement(
@@ -245,7 +245,7 @@ class regexplore(interfaces.plugins.PluginInterface):
             try:
                 try:
                     node_path = hive_list[hive_path].get_key(key, return_list=True) if key else [hive_list[hive_path].get_node(hive.root_cell_offset)]
-                except:
+                except Exception as e:
                     continue
                 for x, y in self._printkey_iterator(hive_list[hive_path], node_path, recurse=recurse):
                     yield (x - len(node_path), y, hive_path)
@@ -293,7 +293,8 @@ class regexplore(interfaces.plugins.PluginInterface):
             "amcacheinventorydriverbinary": AmcacheInventoryDriverBinary.AmcacheInventoryDriverBinary,
             "appcompatcache": AppCompatCache.AppCompatCache,
             "apppaths": AppPaths.AppPaths,
-            "bamdam": BamDam.BamDam
+            "bamdam": BamDam.BamDam,
+            "cidsizemru": CIDSizeMRU.CIDSizeMRU
         }
         
         hive_mapping = {
@@ -314,7 +315,8 @@ class regexplore(interfaces.plugins.PluginInterface):
                 "amcacheinventorydriverbinary": module_mapping["amcacheinventorydriverbinary"],
             },
             "ntuser": {
-                "apppaths": module_mapping["apppaths"]
+                "apppaths": module_mapping["apppaths"],
+                "cidsizemru": module_mapping["cidsizemru"]
             }
         }
     

@@ -1,6 +1,7 @@
 import datetime
 from volatility3.framework.renderers import TreeGrid, format_hints
 import os
+import codecs
 
 COLUMNS = [
     ('Device name', str),
@@ -32,8 +33,8 @@ def write_result_to_csv(
         file_handle.write(header)
         for value in _registry_walker(**walker_options):
             device_name = value[1][2]
-            device_data = value[1][3].replace(b'\x00', b'')
-            file_handle.write(f'{device_name.replace(",", ";")},{device_data.decode("utf-8", errors="ignore").replace(",", ";")}\n')
+            device_data = codecs.decode(value[1][3], "utf-16le")
+            file_handle.write(f'{device_name.replace(",", ";")},{device_data.replace(",", ";")}\n')
     return
 
 def process_values(
@@ -59,12 +60,12 @@ def process_values(
         
     for value in _registry_walker(**walker_options):
         device_name = value[1][2]
-        device_data = value[1][3].replace(b'\x00', b'')
+        device_data = codecs.decode(value[1][3], "utf-16le")
         result = (
             0,
             (
                 device_name,
-                device_data.decode('utf-8', errors='ignore').replace(",", ";")
+                device_data.replace(",", ";")
             ),
         )
         yield result

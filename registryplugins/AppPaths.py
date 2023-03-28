@@ -1,7 +1,7 @@
 import datetime
 from volatility3.framework.renderers import TreeGrid, format_hints
 import os
-
+import codecs
 COLUMNS = [
     ('Timestamp', str),
     ('Hive', str),
@@ -95,7 +95,7 @@ def process_values(
                 registry_key = subkey[1][1]
                 registry_value = subkey[1][2]
                 try:
-                    registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
+                    registry_data = codecs.decode(subkey[1][3], "utf-16le")
                 except:
                     continue
                 # Initialize the registry key entry if it doesn't exist

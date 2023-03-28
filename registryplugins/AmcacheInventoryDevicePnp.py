@@ -2,7 +2,7 @@ import datetime
 from volatility3.framework.renderers import TreeGrid, format_hints
 from volatility3.framework.interfaces import layers
 import os
-
+import codecs
 # Define the columns for the TreeGrid
 COLUMNS = [
     ("Timestamp", str),
@@ -115,7 +115,7 @@ def process_values(
                 registry_key = subkey[1][1]
                 registry_value = subkey[1][2]
                 try:
-                    registry_data = subkey[1][3].replace(b'\x00', b'').decode('utf-8', errors='ignore')
+                    registry_data = codecs.decode(subkey[1][3], "utf-16le")
                 except:
                     continue
 

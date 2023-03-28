@@ -10,6 +10,7 @@ from volatility3.plugins.windows.registry.regexplore.registryplugins import (
     AppPaths,
     BamDam,
     MountedDevices,
+    CIDSizeMRU
 )
 
 # Purpose of each module:
