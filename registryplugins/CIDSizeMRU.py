@@ -15,7 +15,7 @@ def write_result_to_csv(
     hive_list,
     key,
     hive_name,
-    file_output=False
+    output_path='regexplore/CIDSizeMRU.csv'
     ):
     
     os.makedirs('regexplore', exist_ok=True) 
@@ -72,6 +72,7 @@ def process_values(
         'recurse': False,
     }
     entries = {}
+    LastWriteTime = ''
     for value in _registry_walker(**walker_options):
             entries[value[1][2]] = value[1][3]
             LastWriteTime = value[1][0]
