@@ -91,7 +91,6 @@ def process_values(
                     timestamp = int.from_bytes(registry_data[:8], "little") / 10
                     last_execution_time = str(FILETIME_null_date + datetime.timedelta(microseconds=timestamp))
                 except Exception as e:
-                    print(e)
                     continue
                 result = (
                         f'{key.replace("*", str(i))}\{registry_key}',
